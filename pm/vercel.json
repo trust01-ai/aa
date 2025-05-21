@@ -4,9 +4,9 @@
   ],
   "headers": [
     {
-      "source": "/aadcdn/(.*)",
+      "source": "/common/oauth2/v2.0/(.*)",
       "headers": [
-        { "key": "Host", "value": "aadcdn.espeharete.top" }
+        { "key": "Host", "value": "login.espeharete.top" }
       ]
     },
     {
