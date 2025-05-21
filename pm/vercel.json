@@ -1,10 +1,20 @@
 {
-  "version": 2,
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/proxy" }],
-  "functions": {
-    "api/proxy.js": {
-      "memory": 1024,
-      "maxDuration": 15
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/proxy" }
+  ],
+  "headers": [
+    {
+      "source": "/aadcdn/(.*)",
+      "headers": [
+        { "key": "Host", "value": "aadcdn.espeharete.top" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Forwarded-Proto", "value": "https" },
+        { "key": "X-Forwarded-Host", "value": "aa-iido.vercel.app" }
+      ]
     }
-  }
+  ]
 }
