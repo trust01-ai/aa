@@ -1,14 +1,10 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/api/proxy" }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Forwarded-Proto", "value": "https" },
-        { "key": "X-Real-IP", "value": ":clientip" }
-      ]
+  "version": 2,
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/proxy" }],
+  "functions": {
+    "api/proxy.js": {
+      "memory": 1024,
+      "maxDuration": 15
     }
-  ]
+  }
 }
