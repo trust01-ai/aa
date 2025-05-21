@@ -1,5 +1,14 @@
 {
   "rewrites": [
     { "source": "/(.*)", "destination": "/api/proxy" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Forwarded-Proto", "value": "https" },
+        { "key": "X-Real-IP", "value": ":clientip" }
+      ]
+    }
   ]
 }
