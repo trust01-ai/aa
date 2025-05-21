@@ -1,6 +1,5 @@
 {
-  "rewrites": [{ "source": "/api/proxy", "destination": "/api/proxy.js" }],
-  "env": {
-    "BACKEND": "http://evilginx.local:8443"
-  }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/proxy" }
+  ]
 }
